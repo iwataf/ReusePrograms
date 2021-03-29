@@ -70,6 +70,38 @@ namespace iwata
             list.AddRange(complist);
             return list;
         }
+        // 重みを合算して抽選（重み整数以上）
+        // 小数点以下の場合は整数に揃える必要あり
+        private void LotteryPresent()
+        {
+            var present = new Sample.Present_Item();
+            Sample.Present data = MasterReader.Instance.m_PresentData;
+            var list = new List<Sample.Present_Item?>();
+            for (var i = 0; i < data.DataLength; i++)
+            {
+                if (data.Data(i).Value.GroupNo == GroupNo)
+                {
+                    list.Add(data.Data(i));
+                }
+            }
+            var totalWeight = 0;
+            for (var i = 0; i < list.Count; i++)
+            {
+                totalWeight += list[i].Value.PresentRatio;
+            }
+
+            var value = UnityEngine.Random.Range(1, totalWeight + 1);
+            for (var i = 0; i < list.Count; ++i)
+            {
+                if (list[i].Value.PresentRatio >= value)
+                {
+                    present = list[i].Value;
+                    Debug.Log(present.ID);
+                    break;
+                }
+                value -= list[i].Value.PresentRatio;
+            }
+        }
 
     }
 }
